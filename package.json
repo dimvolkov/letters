@@ -1,0 +1,13 @@
+{
+  "name": "letters",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Падающие буквы — тренажёр слепой печати",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.5"
+  }
+}

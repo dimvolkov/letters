@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Падающие буквы — тренажёр слепой печати</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#3b6cf6">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="app">
+
+  <!-- Настройки -->
+  <section id="setup" class="screen active">
+    <h1>Падающие буквы</h1>
+    <p class="subtitle">Тренажёр слепой печати: успейте нажать букву, пока она не упала.</p>
+
+    <form id="setup-form" class="card">
+      <label class="row">
+        <span>Пользователь</span>
+        <input id="user" list="users" required maxlength="40" placeholder="Ваше имя" autocomplete="off">
+        <datalist id="users"></datalist>
+      </label>
+
+      <div class="row">
+        <span>Раскладка</span>
+        <div class="segmented">
+          <label><input type="radio" name="layout" value="ru" checked><span>Русская</span></label>
+          <label><input type="radio" name="layout" value="en"><span>Латинская</span></label>
+        </div>
+      </div>
+
+      <label class="row">
+        <span>Уровень</span>
+        <select id="level"></select>
+      </label>
+
+      <label class="row">
+        <span>Буквы</span>
+        <select id="letters"></select>
+      </label>
+
+      <label class="row">
+        <span>Длительность</span>
+        <select id="duration">
+          <option value="30">30 секунд</option>
+          <option value="60" selected>1 минута</option>
+          <option value="120">2 минуты</option>
+          <option value="300">5 минут</option>
+        </select>
+      </label>
+
+      <label class="check"><input type="checkbox" id="sound" checked> Звук</label>
+
+      <button type="submit" class="primary">Начать</button>
+    </form>
+
+    <section class="card">
+      <div class="history-head">
+        <h2>Результаты <span id="history-user"></span></h2>
+        <button type="button" id="clear-history" class="link" hidden>Очистить</button>
+      </div>
+      <div id="history"></div>
+    </section>
+  </section>
+
+  <!-- Игра -->
+  <section id="game" class="screen">
+    <div class="hud">
+      <span id="hud-info"></span>
+      <span>Время <b id="hud-time">0</b></span>
+      <span class="good">Верно <b id="hud-hits">0</b></span>
+      <span class="bad">Ошибки <b id="hud-errors">0</b></span>
+      <span class="bad">Пропущено <b id="hud-misses">0</b></span>
+    </div>
+    <div id="field" class="playfield">
+      <div id="countdown" class="overlay" hidden></div>
+      <div id="pause" class="overlay" hidden>Пауза<small>Пробел — продолжить</small></div>
+    </div>
+    <p class="hint">Раскладку системы переключать не нужно — учитывается физическая клавиша. Пробел — пауза, Esc — завершить.</p>
+  </section>
+
+  <!-- Результат -->
+  <section id="result" class="screen">
+    <h2>Результат</h2>
+    <p id="result-info" class="muted"></p>
+    <div id="result-stats" class="stats"></div>
+    <p id="result-best" class="muted"></p>
+    <div class="actions">
+      <button type="button" id="save" class="primary">Сохранить результат</button>
+      <button type="button" id="again">Ещё раз</button>
+      <button type="button" id="menu">В меню</button>
+    </div>
+    <p id="save-status" class="good"></p>
+  </section>
+
+</main>
+<script src="app.js"></script>
+</body>
+</html>

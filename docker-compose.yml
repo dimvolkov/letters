@@ -1,0 +1,30 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - DATA_DIR=/app/data
+    volumes:
+      - letters-data:/app/data
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.letters-http.rule=Host(`letters.kachestvobiz-ai.ru`)
+      - traefik.http.routers.letters-http.entrypoints=web
+      - traefik.http.routers.letters-http.middlewares=letters-https
+      - traefik.http.middlewares.letters-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.letters-https.redirectscheme.permanent=true
+      - traefik.http.routers.letters.rule=Host(`letters.kachestvobiz-ai.ru`)
+      - traefik.http.routers.letters.entrypoints=websecure
+      - traefik.http.routers.letters.tls.certresolver=letsencrypt
+      - traefik.http.services.letters.loadbalancer.server.port=3000
+
+volumes:
+  letters-data:
+
+networks:
+  dokploy-network:
+    external: true
