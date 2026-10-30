@@ -26,11 +26,31 @@ const LAYOUTS = {
   },
 };
 
+const KEY_ROWS = [
+  ['Backquote','Digit1','Digit2','Digit3','Digit4','Digit5','Digit6','Digit7','Digit8','Digit9','Digit0','Minus','Equal','Backspace'],
+  ['Tab','KeyQ','KeyW','KeyE','KeyR','KeyT','KeyY','KeyU','KeyI','KeyO','KeyP','BracketLeft','BracketRight'],
+  ['CapsLock','KeyA','KeyS','KeyD','KeyF','KeyG','KeyH','KeyJ','KeyK','KeyL','Semicolon','Quote','Enter'],
+  ['ShiftLeft','KeyZ','KeyX','KeyC','KeyV','KeyB','KeyN','KeyM','Comma','Period','Slash','ShiftRight'],
+  ['Space'],
+];
+const KEY_LABELS = {
+  ru: { Backquote:'ё', Digit1:'1', Digit2:'2', Digit3:'3', Digit4:'4', Digit5:'5', Digit6:'6', Digit7:'7', Digit8:'8', Digit9:'9', Digit0:'0', Minus:'-', Equal:'=', Backspace:'⌫', Tab:'Tab', BracketLeft:'х', BracketRight:'ъ', CapsLock:'Caps', Semicolon:'ж', Quote:'э', Enter:'Enter', ShiftLeft:'Shift', ShiftRight:'Shift', Comma:'б', Period:'ю', Slash:'.', Space:'Пробел' },
+  en: { Backquote:'`', Digit1:'1', Digit2:'2', Digit3:'3', Digit4:'4', Digit5:'5', Digit6:'6', Digit7:'7', Digit8:'8', Digit9:'9', Digit0:'0', Minus:'-', Equal:'=', Backspace:'⌫', Tab:'Tab', BracketLeft:'[', BracketRight:']', CapsLock:'Caps', Semicolon:';', Quote:"'", Enter:'Enter', ShiftLeft:'Shift', ShiftRight:'Shift', Comma:',', Period:'.', Slash:'/', Space:'Space' },
+};
+const SPECIAL_TARGETS = [
+  ['Digit0','0'],['Digit1','1'],['Digit2','2'],['Digit3','3'],['Digit4','4'],['Digit5','5'],['Digit6','6'],['Digit7','7'],['Digit8','8'],['Digit9','9'],
+  ['Minus','-'],['Equal','='],['BracketLeft','['],['BracketRight',']'],['Semicolon',';'],['Quote',"'"],['Comma',','],['Period','.'],['Slash','/'],
+  ['Enter','Enter'],['Backspace','Backspace'],['Tab','Tab'],['CapsLock','Caps Lock'],['ShiftLeft','Shift']
+].map(([code,ch]) => ({ code, ch, label: ch }));
+
 const LETTER_SETS = {
   home: { name: 'Основной ряд', chars: r => r.home },
   homeTop: { name: 'Основной + верхний ряд', chars: r => r.home + r.top },
   homeBottom: { name: 'Основной + нижний ряд', chars: r => r.home + r.bottom },
   all: { name: 'Все буквы', chars: r => r.home + r.top + r.bottom + r.extra },
+  digits: { name: 'Цифры', targets: () => SPECIAL_TARGETS.filter(t => /^Digit/.test(t.code)) },
+  symbols: { name: 'Знаки и служебные клавиши', targets: () => SPECIAL_TARGETS.filter(t => !/^Digit/.test(t.code)) },
+  allKeys: { name: 'Буквы, цифры и клавиши', chars: r => r.home + r.top + r.bottom + r.extra, includeKeys: true },
 };
 
 // fall — сколько секунд буква падает до низа, spawn — интервал появления, мс.
@@ -157,6 +177,45 @@ function describe(s) {
   return [LAYOUTS[s.layout].name, LEVELS[s.level].name, LETTER_SETS[s.letters].name, formatDuration(+s.duration)].join(' · ');
 }
 
+const FINGER_NAMES = ['мизинец','безымянный','средний','указательный','большой'];
+function fingerFor(code) {
+  if (code === 'Space') return 'thumb';
+  if (['KeyQ','KeyA','KeyZ','Digit1','Backquote','Tab','CapsLock','ShiftLeft'].includes(code)) return 'left-0';
+  if (['KeyW','KeyS','KeyX','Digit2'].includes(code)) return 'left-1';
+  if (['KeyE','KeyD','KeyC','Digit3'].includes(code)) return 'left-2';
+  if (['KeyR','KeyT','KeyF','KeyG','KeyV','KeyB','Digit4','Digit5'].includes(code)) return 'left-3';
+  if (['KeyY','KeyU','KeyH','KeyJ','KeyN','KeyM','Digit6','Digit7'].includes(code)) return 'right-3';
+  if (['KeyI','KeyK','Digit8'].includes(code)) return 'right-2';
+  if (['KeyO','KeyL','Digit9'].includes(code)) return 'right-1';
+  return 'right-0';
+}
+function makeTargets(layout, set) {
+  const config = LETTER_SETS[set];
+  const targets = [];
+  if (config.chars) {
+    const chars = config.chars(LAYOUTS[layout].rows);
+    const mapping = layout === 'ru' ? RU_BY_CODE : Object.fromEntries('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(c => [`Key${c}`, c.toLowerCase()]));
+    for (const [code, ch] of Object.entries(mapping)) if (chars.includes(ch)) targets.push({ code, ch });
+  }
+  if (config.targets) targets.push(...config.targets());
+  if (config.includeKeys) targets.push(...SPECIAL_TARGETS);
+  return targets;
+}
+function renderGuide() {
+  if (!game) return;
+  const target = game.letters.reduce((low, l) => (!low || l.y > low.y ? l : low), null);
+  const activeCode = target?.code;
+  $('target-instruction').textContent = target ? `Нажмите: ${target.ch === ' ' ? 'Пробел' : target.ch.toUpperCase()}` : 'Ждём следующую клавишу';
+  const finger = target ? fingerFor(activeCode) : null;
+  $('finger-instruction').textContent = target ? `Палец: ${finger.startsWith('left') ? 'левая рука, ' : 'правая рука, '}${FINGER_NAMES[+(finger.split('-')[1])]}` : '';
+  $('hands').innerHTML = ['left','right'].map(side => `<div class="hand ${side}"><span class="hand-label">${side === 'left' ? 'Левая рука' : 'Правая рука'}</span><div class="fingers">${FINGER_NAMES.map((n,i) => `<span class="finger ${finger === `${side}-${i}` || (finger === 'thumb' && i === 4) ? 'active' : ''}" title="${n}"><i></i>${n}</span>`).join('')}</div></div>`).join('');
+  if (!$('virtual-keyboard').dataset.layout || $('virtual-keyboard').dataset.layout !== game.settings.layout) {
+    $('virtual-keyboard').dataset.layout = game.settings.layout;
+    $('virtual-keyboard').innerHTML = KEY_ROWS.map(row => `<div class="key-row">${row.map(code => `<span class="key ${['Backspace','Tab','CapsLock','Enter','ShiftLeft','ShiftRight','Space'].includes(code) ? 'wide' : ''}" data-code="${code}">${escapeHtml(KEY_LABELS[game.settings.layout][code] || code.slice(3).toLowerCase())}</span>`).join('')}</div>`).join('');
+  }
+  for (const key of $('virtual-keyboard').querySelectorAll('.key')) key.classList.toggle('active', key.dataset.code === activeCode);
+}
+
 // ---------- История ----------
 
 let history = [];
@@ -233,7 +292,7 @@ function startGame() {
   game = {
     settings: s,
     layout,
-    chars: [...LETTER_SETS[s.letters].chars(layout.rows)],
+    targets: makeTargets(s.layout, s.letters),
     level: LEVELS[s.level],
     duration: +s.duration,
     elapsed: 0,
@@ -250,6 +309,7 @@ function startGame() {
   for (const el of field.querySelectorAll('.letter')) el.remove();
   $('hud-info').textContent = describe(s);
   updateHud();
+  renderGuide();
   showScreen('game');
   countdown(3);
 }
@@ -279,16 +339,18 @@ function spawnLetter() {
   }
   g.lastX = x;
 
-  let ch;
-  do ch = g.chars[Math.floor(Math.random() * g.chars.length)];
-  while (g.chars.length > 1 && g.letters.length && ch === g.letters[g.letters.length - 1].ch);
+  let target;
+  do target = g.targets[Math.floor(Math.random() * g.targets.length)];
+  while (g.targets.length > 1 && g.letters.length && target.code === g.letters[g.letters.length - 1].code);
 
   const el = document.createElement('div');
   el.className = 'letter';
-  el.textContent = ch.toUpperCase();
+  el.textContent = target.label || (target.ch === ' ' ? 'Пробел' : target.ch.toUpperCase());
+  if (target.label && target.label.length > 1) el.classList.add('service-letter');
   el.style.left = `${x}px`;
   field.appendChild(el);
-  g.letters.push({ ch, el, y: -56 });
+  g.letters.push({ ...target, el, y: -56 });
+  renderGuide();
 }
 
 function frame(now) {
@@ -312,6 +374,7 @@ function frame(now) {
     l.y += speed * dt;
     if (l.y >= floor) {
       removeLetter(l, 'missed');
+      renderGuide();
       g.misses++;
       sound.play('miss');
     } else {
@@ -330,6 +393,7 @@ function frame(now) {
 function removeLetter(l, cls) {
   game.letters.splice(game.letters.indexOf(l), 1);
   l.el.classList.add(cls);
+  renderGuide();
   setTimeout(() => l.el.remove(), 400);
 }
 
@@ -381,13 +445,12 @@ function onKey(e) {
   if (g.state !== 'running' || e.repeat) return;
 
   // Сначала физическая клавиша — тогда системную раскладку переключать не нужно.
-  const ch = g.layout.fromCode(e.code) ?? (e.key.length === 1 ? e.key.toLowerCase() : null);
-  if (!ch) return;
+  if (!g.targets.some(t => t.code === e.code)) return;
   e.preventDefault();
 
   // Если одинаковых букв несколько, засчитываем ту, что ниже всех.
   const target = g.letters
-    .filter(l => l.ch === ch)
+    .filter(l => l.code === e.code)
     .reduce((low, l) => (!low || l.y > low.y ? l : low), null);
 
   if (target) {
@@ -400,6 +463,7 @@ function onKey(e) {
     flashError();
   }
   updateHud();
+  renderGuide();
 }
 
 function stats(g) {
