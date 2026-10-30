@@ -201,6 +201,9 @@ function makeTargets(layout, set) {
   if (config.includeKeys) targets.push(...SPECIAL_TARGETS);
   return targets;
 }
+function keyLabel(layout, code) {
+  return LAYOUTS[layout].fromCode(code) || KEY_LABELS[layout][code] || code.slice(3).toLowerCase();
+}
 function renderGuide() {
   if (!game) return;
   const target = game.letters.reduce((low, l) => (!low || l.y > low.y ? l : low), null);
@@ -211,7 +214,7 @@ function renderGuide() {
   $('hands').innerHTML = ['left','right'].map(side => `<div class="hand ${side}"><span class="hand-label">${side === 'left' ? 'Левая рука' : 'Правая рука'}</span><div class="fingers">${FINGER_NAMES.map((n,i) => `<span class="finger ${finger === `${side}-${i}` || (finger === 'thumb' && i === 4) ? 'active' : ''}" title="${n}"><i></i>${n}</span>`).join('')}</div></div>`).join('');
   if (!$('virtual-keyboard').dataset.layout || $('virtual-keyboard').dataset.layout !== game.settings.layout) {
     $('virtual-keyboard').dataset.layout = game.settings.layout;
-    $('virtual-keyboard').innerHTML = KEY_ROWS.map(row => `<div class="key-row">${row.map(code => `<span class="key ${['Backspace','Tab','CapsLock','Enter','ShiftLeft','ShiftRight','Space'].includes(code) ? 'wide' : ''}" data-code="${code}">${escapeHtml(KEY_LABELS[game.settings.layout][code] || code.slice(3).toLowerCase())}</span>`).join('')}</div>`).join('');
+    $('virtual-keyboard').innerHTML = KEY_ROWS.map(row => `<div class="key-row">${row.map(code => `<span class="key ${['Backspace','Tab','CapsLock','Enter','ShiftLeft','ShiftRight','Space'].includes(code) ? 'wide' : ''}" data-code="${code}">${escapeHtml(keyLabel(game.settings.layout, code))}</span>`).join('')}</div>`).join('');
   }
   for (const key of $('virtual-keyboard').querySelectorAll('.key')) key.classList.toggle('active', key.dataset.code === activeCode);
 }
