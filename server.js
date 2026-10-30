@@ -69,7 +69,7 @@ function count(value, max) {
 function validateResult(body) {
   const user = cleanUser(body.user);
   if (!LAYOUTS.includes(body.layout) || !LETTERS.includes(body.letters) || !DURATIONS.includes(body.duration)
-    || !Number.isInteger(body.level) || body.level < 1 || body.level > 5) {
+    || !Number.isInteger(body.level) || body.level < 0 || body.level > 5) {
     throw new HttpError(400, 'Некорректные настройки игры');
   }
   const elapsed = count(body.elapsed, body.duration + 1);

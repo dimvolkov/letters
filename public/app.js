@@ -35,6 +35,7 @@ const LETTER_SETS = {
 
 // fall — сколько секунд буква падает до низа, spawn — интервал появления, мс.
 const LEVELS = {
+  0: { name: 'Очень лёгкий', fall: 11, spawn: 1800, maxLetters: 2 },
   1: { name: 'Новичок', fall: 9, spawn: 1800 },
   2: { name: 'Лёгкий', fall: 7, spawn: 1300 },
   3: { name: 'Средний', fall: 5, spawn: 950 },
@@ -302,7 +303,7 @@ function frame(now) {
   const speed = (height + 56) / g.level.fall;
 
   g.sinceSpawn += dt * 1000;
-  if (g.sinceSpawn >= g.level.spawn) {
+  if (g.sinceSpawn >= g.level.spawn && g.letters.length < (g.level.maxLetters ?? Infinity)) {
     g.sinceSpawn = 0;
     spawnLetter();
   }
