@@ -179,12 +179,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .fingers { display: flex; justify-content: center; gap: 5px; margin-top: 6px; }
 .finger { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #9ca3af; font-size: 10px; }
 .finger i { display: block; width: clamp(20px, 4vw, 32px); height: 38px; border-radius: 14px 14px 7px 7px; background: #374151; border: 1px solid #4b5563; }
-.finger:nth-child(1) i { height: 27px; margin-top: 11px; }
-.finger:nth-child(2) i { height: 34px; margin-top: 4px; }
-.finger:nth-child(4) i { height: 31px; margin-top: 7px; }
-.finger:nth-child(5) i { height: 22px; margin-top: 16px; }
-.finger.active { color: #fde68a; font-weight: 700; }
-.finger.active i { background: #f59e0b; border-color: #fde68a; box-shadow: 0 0 12px #f59e0b88; }
+.finger[data-finger="0"] i { height: 27px; margin-top: 11px; }
+.finger[data-finger="1"] i { height: 34px; margin-top: 4px; }
+.finger[data-finger="3"] i { height: 31px; margin-top: 7px; }
+.finger[data-finger="4"] i { height: 22px; margin-top: 16px; }
+.finger[data-active="true"] { color: #fde68a; font-weight: 700; }
+.finger[data-active="true"] i { background: #f59e0b; border-color: #fde68a; box-shadow: 0 0 12px #f59e0b88; }
 .virtual-keyboard { display: grid; gap: 5px; width: min(100%, 940px); margin: 0 auto; }
 .key-row { display: flex; justify-content: center; gap: 4px; }
 .key { flex: 1 1 0; min-width: 0; height: clamp(32px, 4vw, 44px); display: grid; place-items: center; padding: 0 3px; border: 1px solid #4b5563; border-radius: 5px; background: #273244; color: #e5e7eb; font: 600 clamp(10px, 1.5vw, 14px)/1 system-ui, sans-serif; }
