@@ -134,7 +134,6 @@ function currentLayout() {
 
 function readSettings() {
   return {
-    user: $('user').value.trim(),
     layout: currentLayout(),
     level: $('level').value,
     letters: $('letters').value,
@@ -144,7 +143,7 @@ function readSettings() {
 }
 
 function applySettings() {
-  $('user').value = settings.user;
+  $('user').value = settings.user || '';
   const radio = document.querySelector(`input[name="layout"][value="${settings.layout}"]`);
   if (radio) radio.checked = true;
   fillSelect($('level'), LEVELS, settings.level);
@@ -432,7 +431,7 @@ function showResult() {
   const g = game;
   const st = stats(g);
   g.result = st;
-  $('result-info').textContent = `${g.settings.user} · ${describe(g.settings)}`;
+  $('result-info').textContent = describe(g.settings);
   $('result-stats').innerHTML = [
     [st.cpm, 'знаков в минуту'],
     [`${st.accuracy}%`, 'точность'],
@@ -449,12 +448,20 @@ function showResult() {
   $('save').disabled = false;
   $('save').textContent = 'Сохранить результат';
   $('save-status').textContent = '';
+  $('result-user').value = $('user').value.trim() || settings.user;
   showScreen('result');
 }
 
 async function saveResult() {
   const g = game;
   const btn = $('save');
+  const user = $('result-user').value.trim();
+  if (!user) {
+    $('result-user').focus();
+    $('save-status').className = 'bad';
+    $('save-status').textContent = 'Введите имя, под которым сохранить результат.';
+    return;
+  }
   btn.disabled = true;
   $('save-status').className = 'good';
   $('save-status').textContent = 'Сохраняю…';
@@ -462,7 +469,7 @@ async function saveResult() {
     await api('/api/results', {
       method: 'POST',
       body: {
-        user: g.settings.user,
+        user,
         layout: g.settings.layout,
         level: +g.settings.level,
         letters: g.settings.letters,
@@ -475,6 +482,10 @@ async function saveResult() {
     });
     btn.textContent = 'Сохранено';
     $('save-status').textContent = 'Результат сохранён.';
+    settings.user = user;
+    storage.set('settings', settings);
+    $('user').value = user;
+    g.settings.user = user;
     loadUsers();
     loadHistory();
   } catch (e) {
@@ -493,10 +504,24 @@ function toMenu() {
 
 // ---------- Подписки ----------
 
-$('setup-form').addEventListener('submit', e => {
-  e.preventDefault();
+function persistSettings() {
   Object.assign(settings, readSettings());
   storage.set('settings', settings);
+}
+
+$('settings-form').addEventListener('submit', e => {
+  e.preventDefault();
+  persistSettings();
+});
+
+$('settings-toggle').addEventListener('click', () => {
+  const form = $('settings-form');
+  form.hidden = !form.hidden;
+  $('settings-toggle').setAttribute('aria-expanded', String(!form.hidden));
+});
+
+$('start').addEventListener('click', () => {
+  persistSettings();
   startGame();
 });
 

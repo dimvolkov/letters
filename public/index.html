@@ -11,17 +11,18 @@
 <body>
 <main class="app">
 
-  <!-- Настройки -->
+  <!-- Главное меню -->
   <section id="setup" class="screen active">
     <h1>Падающие буквы</h1>
     <p class="subtitle">Тренажёр слепой печати: успейте нажать букву, пока она не упала.</p>
 
-    <form id="setup-form" class="card">
-      <label class="row">
-        <span>Пользователь</span>
-        <input id="user" list="users" required maxlength="40" placeholder="Ваше имя" autocomplete="off">
-        <datalist id="users"></datalist>
-      </label>
+    <div class="menu-actions">
+      <button type="button" id="start" class="primary">Начать игру</button>
+      <button type="button" id="settings-toggle" aria-expanded="false" aria-controls="settings-form">Настройки</button>
+    </div>
+
+    <form id="settings-form" class="card" hidden>
+      <h2>Настройки игры</h2>
 
       <div class="row">
         <span>Раскладка</span>
@@ -53,7 +54,6 @@
 
       <label class="check"><input type="checkbox" id="sound" checked> Звук</label>
 
-      <button type="submit" class="primary">Начать</button>
     </form>
 
     <section class="card">
@@ -61,6 +61,11 @@
         <h2>Результаты <span id="history-user"></span></h2>
         <button type="button" id="clear-history" class="link" hidden>Очистить</button>
       </div>
+      <label class="history-user-input">
+        <span class="visually-hidden">Имя пользователя</span>
+        <input id="user" list="users" maxlength="40" placeholder="Введите имя, чтобы посмотреть результаты" autocomplete="off">
+        <datalist id="users"></datalist>
+      </label>
       <div id="history"></div>
     </section>
   </section>
@@ -87,6 +92,10 @@
     <p id="result-info" class="muted"></p>
     <div id="result-stats" class="stats"></div>
     <p id="result-best" class="muted"></p>
+    <label class="save-user">
+      <span>Сохранить результат под именем</span>
+      <input id="result-user" list="users" maxlength="40" placeholder="Ваше имя" autocomplete="off">
+    </label>
     <div class="actions">
       <button type="button" id="save" class="primary">Сохранить результат</button>
       <button type="button" id="again">Ещё раз</button>
