@@ -188,6 +188,11 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .virtual-keyboard { display: grid; gap: 5px; width: min(100%, 940px); margin: 0 auto; }
 .key-row { display: flex; justify-content: center; gap: 4px; }
 .key { flex: 1 1 0; min-width: 0; height: clamp(32px, 4vw, 44px); display: grid; place-items: center; padding: 0 3px; border: 1px solid #4b5563; border-radius: 5px; background: #273244; color: #e5e7eb; font: 600 clamp(10px, 1.5vw, 14px)/1 system-ui, sans-serif; }
+.key[data-finger="left-0"], .key[data-finger="right-0"], .finger[data-finger$="-0"] i { border-bottom: 4px solid #fb7185; }
+.key[data-finger="left-1"], .key[data-finger="right-1"], .finger[data-finger$="-1"] i { border-bottom: 4px solid #fb923c; }
+.key[data-finger="left-2"], .key[data-finger="right-2"], .finger[data-finger$="-2"] i { border-bottom: 4px solid #facc15; }
+.key[data-finger="left-3"], .key[data-finger="right-3"], .finger[data-finger$="-3"] i { border-bottom: 4px solid #4ade80; }
+.key[data-finger="thumb"], .finger[data-finger$="-4"] i { border-bottom: 4px solid #60a5fa; }
 .key.wide { flex-grow: 1.6; }
 .key[data-code="Space"] { flex-grow: 7; }
 .key.active { background: #f59e0b; color: #111827; border-color: #fde68a; box-shadow: 0 0 14px #f59e0b99; transform: translateY(-2px); }
