@@ -99,6 +99,10 @@ function formatDuration(sec) {
 
 function showScreen(id) {
   for (const el of document.querySelectorAll('.screen')) el.classList.toggle('active', el.id === id);
+  const decor = document.querySelector('.background-decor');
+  const field = $('field');
+  if (id === 'game') field.prepend(decor);
+  else document.body.prepend(decor);
 }
 
 // ---------- Звук ----------

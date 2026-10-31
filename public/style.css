@@ -32,13 +32,17 @@ body {
   color: var(--text);
   font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
-.background-decor { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.background-decor { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; --fall-distance: 100vh; }
+#field .background-decor { position: absolute; --fall-distance: min(70vh, 560px); }
 .app { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
 body { overflow-x: hidden; }
 .capybara { position: absolute; left: 0; width: 100px; height: 52px; opacity: .22; will-change: translate; animation: capy-run 46s linear infinite; }
 .capybara-one { top: 18%; }
 .capybara-two { top: 57%; animation-delay: -17s; animation-duration: 54s; transform: scaleX(-1); }
 .capybara-three { top: 82%; animation-delay: -32s; animation-duration: 50s; }
+.capy-leg { transform-box: fill-box; transform-origin: 50% 0; animation: legs-run .34s ease-in-out infinite alternate; }
+.front-leg { animation-delay: -.17s; }
+@keyframes legs-run { to { rotate: 24deg; } }
 .poop { position: absolute; top: -48px; font-size: 18px; opacity: .24; will-change: translate, rotate; animation: poop-fall 25s linear infinite; }
 .poop-one { left: 24%; }
 .poop-two { left: 67%; animation-delay: -9s; animation-duration: 30s; }
@@ -50,9 +54,9 @@ body { overflow-x: hidden; }
   32% { translate: calc(32vw - 150px) -4px; }
   100% { translate: calc(100vw + 150px) 0; }
 }
-@keyframes poop-fall { to { translate: 0 calc(100vh + 60px); rotate: 300deg; } }
+@keyframes poop-fall { to { translate: 0 calc(var(--fall-distance) + 60px); rotate: 300deg; } }
 @media (prefers-reduced-motion: reduce) {
-  .capybara, .poop { animation: none; }
+  .capybara, .capy-leg, .poop { animation: none; }
   .capybara-one { left: 8px; }
   .capybara-two { left: auto; right: 8px; }
   .capybara-three, .poop { display: none; }
