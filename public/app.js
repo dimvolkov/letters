@@ -45,9 +45,11 @@ const SPECIAL_TARGETS = [
 
 const LETTER_SETS = {
   home: { name: 'Основной ряд', chars: r => r.home },
+  homeDigits: { name: 'Основной ряд + цифры', chars: r => r.home, targets: () => SPECIAL_TARGETS.filter(t => /^Digit/.test(t.code)) },
   homeTop: { name: 'Основной + верхний ряд', chars: r => r.home + r.top },
   homeBottom: { name: 'Основной + нижний ряд', chars: r => r.home + r.bottom },
   all: { name: 'Все буквы', chars: r => r.home + r.top + r.bottom + r.extra },
+  allDigits: { name: 'Все буквы + цифры', chars: r => r.home + r.top + r.bottom + r.extra, targets: () => SPECIAL_TARGETS.filter(t => /^Digit/.test(t.code)) },
   digits: { name: 'Цифры', targets: () => SPECIAL_TARGETS.filter(t => /^Digit/.test(t.code)) },
   symbols: { name: 'Знаки и служебные клавиши', targets: () => SPECIAL_TARGETS.filter(t => !/^Digit/.test(t.code)) },
   allKeys: { name: 'Буквы, цифры и клавиши', chars: r => r.home + r.top + r.bottom + r.extra, includeKeys: true },
